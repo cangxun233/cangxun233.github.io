@@ -59,8 +59,8 @@
                 <div class="grid-content bg-purple"></div>
             </el-col>
             <el-col :span="14">
-                <el-button plain :title="ticket.description" :alt="ticket.description" :key="ticket.name" v-for="ticket in ticketList"
-                    :class="['my-btn',{'my-disabled':ticket.disable}]" :type="ticket.level"
+                <el-button plain :title="ticket.description" :alt="ticket.description" :key="ticket.name"
+                    v-for="ticket in ticketList" :class="['my-btn',{'my-disabled':ticket.disable}]" :type="ticket.level"
                     @click="handleDisable(ticket)">
                     {{ticket.name}}</el-button>
 
@@ -94,7 +94,12 @@
             tips: "点击下方按钮开始抽卡",
             ticket: {}, //对象
             newList: [], //去除禁用后的数组
-            timer: null //定时器
+            timer: null, //定时器
+            ssr: [],
+            sr: [],
+            r: [],
+            n: [],
+            rate: [10, 20, 30, 40] //对应的SSR,SR,R,N的爆率，加起来要等于100
         },
         methods: {
             //初始化数据方法
@@ -136,7 +141,8 @@
                     }
                 } else {
                     clearInterval(this.timer);
-                    this.timer=null
+                    this.timer = null
+                    this.updateNewList()
                     this.lucky()
                     if (this.resultList.length > 0) {
                         this.tips = "恭喜您，获得了:[" + this.ticket.name + "]*1"
@@ -147,12 +153,38 @@
 
             },
             lucky() {
-                this.ticket = this.newList[Math.floor(Math.random() * this.newList.length)]
-                if (this.isOnlyOne) {
-                    this.ticket.disable = true
-                    // this.updateNewList()
+                let level = Math.round(Math.random() * 100);
+                console.log(level);
+                let ssr = this.rate[0],
+                    sr = (this.rate[0] + this.rate[1]),
+                    r = (this.rate[0] + this.rate[1] + this.rate[2]),
+                    n = (this.rate[0] + this.rate[1] + this.rate[2] + this.rate[3]);
+                if (level >= 0 && level <= ssr) {
+                    this.ticket = this.ssr[Math.floor(Math.random() * this.ssr.length)]
+                } else if (level > ssr && level <= sr) {
+                    this.ticket = this.sr[Math.floor(Math.random() * this.sr.length)]
+                } else if (level > sr && level <= r) {
+                    this.ticket = this.r[Math.floor(Math.random() * this.r.length)]
+                } else if (level > r && level <= n) {
+                    this.ticket = this.n[Math.floor(Math.random() * this.n.length)]
                 }
-                this.resultList.push(this.ticket)
+                if (!this.ticket) {
+                    console.log("没有该等级了");
+                    this.lucky()
+                } else {
+                    if (this.ticket.disable) {
+                        this.lucky()
+
+                    } else {
+                        if (this.isOnlyOne) {
+                            console.log(this.ticket);
+                            this.ticket.disable = true
+                        }
+                        this.resultList.push(this.ticket)
+                    }
+                }
+
+
             },
             show() {
                 this.timer = setInterval(() => {
@@ -160,10 +192,24 @@
                 }, 50)
             },
             updateNewList() {
-                this.newList = []
+                this.newList = [], this.n = [], this.r = [], this.sr = [], this.ssr = []
                 for (ticket of this.ticketList) {
                     if (!ticket.disable) {
                         this.newList.push(ticket)
+                        switch (ticket.level) {
+                            case 'info':
+                                this.n.push(ticket)
+                                break;
+                            case 'success':
+                                this.r.push(ticket)
+                                break;
+                            case 'primary':
+                                this.sr.push(ticket)
+                                break;
+                            case 'warning':
+                                this.ssr.push(ticket)
+                                break;
+                        }
                     }
                 }
             }
