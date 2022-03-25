@@ -3,6 +3,11 @@
         "level": "SSR",
         "description": "强制交换券",
         "disable": false
+    },{
+        "name": "无中生有券",
+        "level": "SSR",
+        "description": "再来两张",
+        "disable": false
     },
     {
         "name": "独处半小时券",
