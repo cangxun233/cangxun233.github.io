@@ -46,6 +46,8 @@
 
         .my-tag {
             width: 150px;
+            margin-left: 0 !important;
+            margin-right: 15px;
         }
     </style>
 </head>
@@ -57,7 +59,7 @@
                 <div class="grid-content bg-purple"></div>
             </el-col>
             <el-col :span="14">
-                <el-button plain :key="ticket.name" v-for="ticket in ticketList"
+                <el-button plain :title="ticket.description" :alt="ticket.description" :key="ticket.name" v-for="ticket in ticketList"
                     :class="['my-btn',{'my-disabled':ticket.disable}]" :type="ticket.level"
                     @click="handleDisable(ticket)">
                     {{ticket.name}}</el-button>
@@ -71,9 +73,6 @@
                         <el-button type="primary" size="medium" @click="handleStart()">{{visible}}</el-button>
                     </template>
                 </el-result>
-            </el-col>
-            <el-col :span="2">
-                <div class="grid-content bg-purple"></div>
             </el-col>
         </el-row>
 
