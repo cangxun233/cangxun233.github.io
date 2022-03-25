@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情侣兑换券</title>
+    <!--引入 element-ui 的样式，-->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .el-tag+.el-tag {
+            margin-left: 10px;
+        }
+
+        .button-new-tag {
+            margin-left: 10px;
+            height: 32px;
+            line-height: 30px;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .input-new-tag {
+            width: 90px;
+            margin-left: 10px;
+            vertical-align: bottom;
+        }
+
+        .my-disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .my-btn {
+            width: 140px;
+            margin-bottom: 15px;
+            margin-left: 0 !important;
+            margin-right: 15px;
+        }
+
+        .btn-checked {
+            background-color: tomato;
+            color: tomato;
+        }
+
+        .my-tag {
+            width: 150px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <el-row type="flex" class="row-bg" justify="center">
+            <el-col :span="2">
+                <div class="grid-content bg-purple"></div>
+            </el-col>
+            <el-col :span="14">
+                <el-button plain :key="ticket.name" v-for="ticket in ticketList"
+                    :class="['my-btn',{'my-disabled':ticket.disable}]" :type="ticket.level"
+                    @click="handleDisable(ticket)">
+                    {{ticket.name}}</el-button>
+
+                <el-result :title="tips">
+                    <template slot="icon">
+                        <el-tag :key="res.name" v-for="res in resultList" :type="res.level" class="my-tag">
+                            {{res.name}}</el-tag>
+                    </template>
+                    <template slot="extra">
+                        <el-button type="primary" size="medium" @click="handleStart()">{{visible}}</el-button>
+                    </template>
+                </el-result>
+            </el-col>
+            <el-col :span="2">
+                <div class="grid-content bg-purple"></div>
+            </el-col>
+        </el-row>
+
+    </div>
+</body>
+<!-- vue.js & axios -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- 引入element 的组件库-->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            ticketList: [], //奖券数据
+            isOnlyOne: true, //结果是否能重复
+            resultList: [], //最终结果
+            visible: "开始", //展示
+            tips: "点击下方按钮开始抽卡",
+            ticket: {}, //对象
+            newList: [], //去除禁用后的数组
+            timer: null //定时器
+        },
+        methods: {
+            //初始化数据方法
+            async init() {
+                const {
+                    data
+                } = await axios.get('./ticketList.json')
+                data.forEach(ticket => {
+                    switch (ticket.level) {
+                        case "N":
+                            ticket.level = "info" //灰色
+                            break;
+                        case "R":
+                            ticket.level = "success" //绿色
+                            break;
+                        case "SR":
+                            ticket.level = "primary" //蓝色
+                            break;
+                        case "SSR":
+                            ticket.level = "warning" //橘色
+                            break;
+                    }
+                });
+                this.ticketList = data
+            },
+            handleDisable(ticket) {
+                this.$set(ticket, 'disable', !ticket.disable)
+                // this.updateNewList()
+            },
+            handleStart() {
+                if (this.visible == "开始") {
+                    this.updateNewList()
+                    if (this.newList.length === 0) {
+                        this.$message.error('别点了别点了，奖池空啦！');
+                    } else {
+                        this.visible = "停止"
+                        this.show()
+                        // console.log("start");
+                    }
+                } else {
+                    clearInterval(this.timer);
+                    this.timer=null
+                    this.lucky()
+                    if (this.resultList.length > 0) {
+                        this.tips = "恭喜您，获得了:[" + this.ticket.name + "]*1"
+                        this.visible = "开始"
+                    }
+                    console.log("stop");
+                }
+
+            },
+            lucky() {
+                this.ticket = this.newList[Math.floor(Math.random() * this.newList.length)]
+                if (this.isOnlyOne) {
+                    this.ticket.disable = true
+                    // this.updateNewList()
+                }
+                this.resultList.push(this.ticket)
+            },
+            show() {
+                this.timer = setInterval(() => {
+                    this.tips = this.newList[Math.floor(Math.random() * this.newList.length)].name
+                }, 50)
+            },
+            updateNewList() {
+                this.newList = []
+                for (ticket of this.ticketList) {
+                    if (!ticket.disable) {
+                        this.newList.push(ticket)
+                    }
+                }
+            }
+        },
+        created() {
+            this.init();
+        },
+    })
+</script>
+
+</html>
