@@ -1,7 +1,7 @@
 [{
         "name": "强制交换券",
         "level": "SSR",
-        "description": "强制交换券",
+        "description": "使用后，可拿别的卡强制更换成对方一张卡牌",
         "disable": false,
         "color": "warning"
     },
@@ -20,23 +20,16 @@
         "color": "warning"
     },
     {
-        "name": "听我的券",
-        "level": "SSR",
-        "description": "听我的券",
-        "disable": false,
-        "color": "warning"
-    },
-    {
         "name": "复制券",
         "level": "SSR",
-        "description": "复制券",
+        "description": "CV大法好！",
         "disable": false,
         "color": "warning"
     },
     {
         "name": "独处半小时券",
         "level": "SR",
-        "description": "独处半小时券",
+        "description": "我想静静~",
         "disable": false,
         "color": "primary"
     },
@@ -50,7 +43,7 @@
     {
         "name": "随叫随到券",
         "level": "SR",
-        "description": "随叫随到券",
+        "description": "你先过来！",
         "disable": false,
         "color": "primary"
     },
@@ -64,16 +57,9 @@
     {
         "name": "拒绝券",
         "level": "SR",
-        "description": "拒绝券",
+        "description": "吴京：达咩！",
         "disable": false,
         "color": "primary"
-    },
-    {
-        "name": "按摩十分钟券",
-        "level": "R",
-        "description": "按摩十分钟券",
-        "disable": false,
-        "color": "success"
     },
     {
         "name": "腻腻歪歪券",
@@ -99,7 +85,7 @@
     {
         "name": "上号券",
         "level": "R",
-        "description": "陪我打游戏券",
+        "description": "陪我打游戏",
         "disable": false,
         "color": "success"
     },
@@ -128,6 +114,20 @@
         "name": "贴贴券",
         "level": "N",
         "description": "贴贴券",
+        "disable": false,
+        "color": "info"
+    },
+    {
+        "name": "称呼改变券",
+        "level": "N",
+        "description": "改变称呼1分钟",
+        "disable": false,
+        "color": "info"
+    },
+    {
+        "name": "按摩十分钟券",
+        "level": "N",
+        "description": "按摩十分钟",
         "disable": false,
         "color": "info"
     }

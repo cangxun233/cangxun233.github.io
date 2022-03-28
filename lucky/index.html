@@ -69,9 +69,9 @@
                     v-for="ticket in ticketList" :class="['my-btn',{'my-disabled':ticket.disable}]" :type="ticket.color"
                     @click="handleDisable(ticket)">
                     {{ticket.name}}</el-button>
+                <el-divider></el-divider>
                 <el-result :title="showStr.tips">
                     <template slot="icon">
-                        <hr />
                         <el-tag :key="i" v-for="(res,i) in resultList" :type="res.color" class="my-tag">
                             {{res.name}}</el-tag>
                     </template>
