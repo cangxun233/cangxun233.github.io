@@ -5,6 +5,7 @@
     博客链接： https://mcok.top/
     版权声明： 本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！
 -->
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -65,18 +66,18 @@
             </el-col>
             <el-col :span="14">
                 <el-button plain :title="ticket.description" :alt="ticket.description" :key="ticket.name"
-                    v-for="ticket in ticketList" :class="['my-btn',{'my-disabled':ticket.disable}]" :type="ticket.level"
+                    v-for="ticket in ticketList" :class="['my-btn',{'my-disabled':ticket.disable}]" :type="ticket.color"
                     @click="handleDisable(ticket)">
                     {{ticket.name}}</el-button>
-
-                <el-result :title="tips">
+                <el-result :title="showStr.tips">
                     <template slot="icon">
-                        <el-tag :key="res.name" v-for="res in resultList" :type="res.level" class="my-tag">
+                        <hr />
+                        <el-tag :key="i" v-for="(res,i) in resultList" :type="res.color" class="my-tag">
                             {{res.name}}</el-tag>
                     </template>
                     <template slot="extra">
-                        <el-button type="success" size="medium" @click="handleOnlyOne()">{{only}}</el-button>
-                        <el-button type="primary" size="medium" @click="handleStart()">{{visible}}</el-button>
+                        <el-button type="success" size="medium" @click="handleOnlyOne()">当前:{{showStr.only}}</el-button>
+                        <el-button type="primary" size="medium" @click="handleStart()">{{showStr.visible}}</el-button>
                         <el-button type="error" size="medium" @click="exportJson()">导出结果</el-button>
                     </template>
                 </el-result>
@@ -97,16 +98,14 @@
             ticketList: [], //奖券数据
             isOnlyOne: true, //结果不重复
             resultList: [], //最终结果
-            visible: "开始", //展示
-            only: "当前:不可重复",
-            tips: "点击下方按钮开始抽卡",
+            showStr: {
+                visible: "开始", //展示
+                only: "不可重复",
+                tips: "点击下方按钮开始抽卡",
+            },
             ticket: {}, //对象
-            newList: [], //去除禁用后的数组
             timer: null, //定时器
-            ssr: [],
-            sr: [],
-            r: [],
-            n: [],
+            levelList: {},
             rate: [10, 20, 30, 40] //对应的SSR,SR,R,N的爆率，加起来要等于100
         },
         methods: {
@@ -115,115 +114,122 @@
                 const {
                     data
                 } = await axios.get('./ticketList.json')
-                data.forEach(ticket => {
-                    switch (ticket.level) {
-                        case "N":
-                            ticket.level = "info" //灰色
-                            break;
-                        case "R":
-                            ticket.level = "success" //绿色
-                            break;
-                        case "SR":
-                            ticket.level = "primary" //蓝色
-                            break;
-                        case "SSR":
-                            ticket.level = "warning" //橘色
-                            break;
-                    }
-                });
                 this.ticketList = data
             },
             handleDisable(ticket) {
                 this.$set(ticket, 'disable', !ticket.disable)
-                // this.updateNewList()
             },
             handleStart() {
-                if (this.visible == "开始") {
-                    this.updateNewList()
-                    if (this.newList.length === 0) {
+                let count = this.updateNewList();
+                if (this.showStr.visible == "开始") {
+                    if (count === 0) {
                         this.$message.error('别点了别点了，奖池空啦！');
                     } else {
-                        this.visible = "停止"
+                        this.showStr.visible = "停止"
                         this.show()
-                        // console.log("start");
                     }
                 } else {
                     clearInterval(this.timer);
                     this.timer = null
-                    this.updateNewList()
                     this.lucky()
                     if (this.resultList.length > 0) {
-                        this.tips = "恭喜您，获得了:[" + this.ticket.name + "]*1"
-                        this.visible = "开始"
+                        this.showStr.tips = "恭喜您，获得了:[" + this.ticket.name + "]*1"
+                        this.showStr.visible = "开始"
                     }
-                    console.log("stop");
                 }
 
             },
             lucky() {
                 let level = Math.round(Math.random() * 100);
-                console.log(level);
                 let ssr = this.rate[0],
                     sr = (this.rate[0] + this.rate[1]),
                     r = (this.rate[0] + this.rate[1] + this.rate[2]),
                     n = (this.rate[0] + this.rate[1] + this.rate[2] + this.rate[3]);
                 if (level >= 0 && level <= ssr) {
-                    this.ticket = this.ssr[Math.floor(Math.random() * this.ssr.length)]
+                    this.ticket = this.levelList.ssr[Math.floor(Math.random() * this.levelList.ssr.length)]
                 } else if (level > ssr && level <= sr) {
-                    this.ticket = this.sr[Math.floor(Math.random() * this.sr.length)]
+                    this.ticket = this.levelList.sr[Math.floor(Math.random() * this.levelList.sr.length)]
                 } else if (level > sr && level <= r) {
-                    this.ticket = this.r[Math.floor(Math.random() * this.r.length)]
+                    this.ticket = this.levelList.r[Math.floor(Math.random() * this.levelList.r.length)]
                 } else if (level > r && level <= n) {
-                    this.ticket = this.n[Math.floor(Math.random() * this.n.length)]
+                    this.ticket = this.levelList.n[Math.floor(Math.random() * this.levelList.n.length)]
                 }
                 if (!this.ticket) {
                     this.lucky()
                 } else {
-                    if (this.ticket.disable) {
-                        this.lucky()
-
-                    } else {
-                        if (this.isOnlyOne) {
-                            console.log(this.ticket);
+                    if (this.isOnlyOne) {
+                        //only
+                        if (this.ticket.disable) {
+                            this.lucky()
+                        } else {
+                            this.resultList.push(this.ticket)
                             this.ticket.disable = true
                         }
+                    } else {
                         this.resultList.push(this.ticket)
                     }
                 }
             },
             show() {
                 this.timer = setInterval(() => {
-                    this.tips = this.newList[Math.floor(Math.random() * this.newList.length)].name
+                    this.showStr.tips = this.ticketList[Math.floor(Math.random() * this.ticketList
+                        .length)].name
                 }, 50)
             },
             updateNewList() {
-                this.newList = [], this.n = [], this.r = [], this.sr = [], this.ssr = []
+                let count = 0
+                this.levelList = {
+                    ssr: [],
+                    sr: [],
+                    r: [],
+                    n: []
+                }
                 for (ticket of this.ticketList) {
-                    if (!ticket.disable) {
-                        this.newList.push(ticket)
+                    if (this.isOnlyOne) {
+                        if (!ticket.disable) {
+                            count++
+                            switch (ticket.level) {
+                                case 'N':
+                                    this.levelList.n.push(ticket)
+                                    break;
+                                case 'R':
+                                    this.levelList.r.push(ticket)
+                                    break;
+                                case 'SR':
+                                    this.levelList.sr.push(ticket)
+                                    break;
+                                case 'SSR':
+                                    this.levelList.ssr.push(ticket)
+                                    break;
+                            }
+                        }
+                    } else {
+                        count++
                         switch (ticket.level) {
-                            case 'info':
-                                this.n.push(ticket)
+                            case 'N':
+                                this.levelList.n.push(ticket)
                                 break;
-                            case 'success':
-                                this.r.push(ticket)
+                            case 'R':
+                                this.levelList.r.push(ticket)
                                 break;
-                            case 'primary':
-                                this.sr.push(ticket)
+                            case 'SR':
+                                this.levelList.sr.push(ticket)
                                 break;
-                            case 'warning':
-                                this.ssr.push(ticket)
+                            case 'SSR':
+                                this.levelList.ssr.push(ticket)
                                 break;
                         }
                     }
+
                 }
+                return count
             },
             handleOnlyOne() {
-                if (this.only === "当前:不可重复") {
-                    this.only = "当前:可重复"
+                if (this.showStr.only === "不可重复") {
+                    this.showStr.only = "可重复"
                     this.isOnlyOne = false
                 } else {
-                    this.only = "当前:不可重复"
+                    this.showStr.only = "不可重复"
                     this.isOnlyOne = true
                 }
             },
