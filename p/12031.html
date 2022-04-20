@@ -249,6 +249,13 @@
             </span>
 
           
+            <span id="/p/12031.html" class="post-meta-item leancloud_visitors" data-flag-title="2022-4-20-周三-小记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
@@ -256,6 +263,20 @@
               <span class="post-meta-item-text">阅读次数：</span>
               <span id="busuanzi_value_page_pv"></span>
             </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/p/12031.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/p/12031.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
 
         </div>
       </header>
@@ -269,7 +290,7 @@
         <p>天气：☀️；地点：🏫；心情：😚<br>
 一句话评价：约会！约会！</p>
 <span id="more"></span>
-<h3 id="早上-v21"><a class="header-anchor" href="#早上-v21">¶</a>早上</h3>
+<h3 id="早上-v22"><a class="header-anchor" href="#早上-v22">¶</a>早上</h3>
 <p>早上差点没给我气死，我订的7点26分的闹铃，但是在我闹铃响之前，舍友分别定了7点10分、7点15分、7点20分的闹铃，我感觉我也要神经衰弱了…</p>
 <p>洗漱完，就找仙女👸回班，仙女👸偷偷塞给我4包养生茶，仙女👸多少有点不尊重小太源了…</p>
 <p>老老实实去打了水，一次性泡了两包，有了一点点甜味.</p>
@@ -330,7 +351,7 @@
 
           </div>
           
-    <div class="comments" id="gitalk-container"></div>
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -377,7 +398,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A9%E4%B8%8A-v21"><span class="nav-text">早上</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A9%E4%B8%8A-v22"><span class="nav-text">早上</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -578,23 +599,32 @@
 
   
 
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
 
 <script>
-NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
-  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
-    var gitalk = new Gitalk({
-      clientID    : 'f0f8f47431b0b213532f',
-      clientSecret: '7018ca36b6dff8919e8a274df16161f468e46197',
-      repo        : 'Gitalk',
-      owner       : 'cangxun233',
-      admin       : ['cangxun233'],
-      id          : '82d46dbebcf9e6c9d036b071f042f22c',
-        language: 'zh-CN',
-      distractionFreeMode: true
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
     });
-    gitalk.render('gitalk-container');
-  }, window.Gitalk);
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'UApxyEcdNeGLQHNyjQJNOdHq-gzGzoHsz',
+      appKey     : '5BVOAAINMHDuxb5i08zYa5Ot',
+      placeholder: "开始畅言吧",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : true,
+      serverURLs : ''
+    });
+  }, window.Valine);
 });
 </script>
 
